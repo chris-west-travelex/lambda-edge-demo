@@ -1,0 +1,25 @@
+# vi temp files
+*.swp
+*.swo
+
+# don't put PEM files in source control!
+*.pem
+*.key
+
+# Vagrant
+.vagrant
+
+# don't check in Python's env folder
+env
+
+# mac
+.DS_Store
+
+#Jetbrains
+.idea
+
+# ansible
+*.retry
+
+# log files
+*.log

@@ -1,0 +1,7 @@
+---
+# settings for localhost to ensure a good python interpreter is used and no SSH is involved
+ansible_python_interpreter: "/usr/bin/env python"
+ansible_connection: local
+ansible_sudo: no
+
+aws_environment: "{{group_names[0]}}"

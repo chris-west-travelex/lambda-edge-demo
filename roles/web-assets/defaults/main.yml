@@ -1,0 +1,13 @@
+---
+# Defaults
+# ========
+#
+# ..var:: string cdn_price_class
+#
+#    Price class for CloudFront. Must be *PriceClass_100*, *PriceClass_200* or
+#    *PriceClass_All*, indicating how many CloudFront servers (and in which
+#    locations) should be used.
+#
+#    See: http://aws.amazon.com/cloudfront/pricing/
+#
+cdn_price_class: PriceClass_100

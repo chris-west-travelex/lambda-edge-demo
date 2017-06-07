@@ -1,0 +1,60 @@
+---
+# CDN Resources
+# =============
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Create CDN, S3 and Lambda resources.
+Parameters:
+  Environment:
+    Type: String
+    Description: >
+      The name of the environment that these resources are being created for,
+      e.g. "demo".
+  PriceClass:
+    Type: String
+    Description: >
+      The CloudFront price class, e.g. PriceClass_100.
+Resources:
+  CDNAssets:
+    # S3 bucket for storing the CDN web assets (e.g. HTML, CSS)
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: PublicRead
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: ["GET", "HEAD"]
+            AllowedOrigins: ["*"]
+      LoggingConfiguration:
+        DestinationBucketName: !Ref CDNLogs
+        LogFilePrefix: "s3/"
+
+  CDNLogs:
+    # S3 bucket for storing access logs for CloudFront and the assets
+    # themselves.
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: LogDeliveryWrite
+
+  CDNLogsAccessPolicy:
+    # S3 bucket policy to prevent tampering with logs
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref CDNLogs
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: denyDeleteLogs
+            Effect: Deny
+            Principal: "*"
+            Action:
+              - "s3:DeleteObject"
+            Resource:
+              - !Sub "arn:aws:s3:::${CDNLogs}/*"
+          - Sid: denyDeleteLifecycle
+            Effect: Deny
+            Principal: "*"
+            Action:
+              - "s3:PutLifecycleConfiguration"
+            Resource:
+              - !Sub "arn:aws:s3:::${CDNLogs}"

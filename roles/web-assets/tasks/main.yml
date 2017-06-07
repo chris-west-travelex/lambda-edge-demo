@@ -1,0 +1,14 @@
+---
+# Tasks
+# =====
+#
+- name: Create CDN distribution and associated resources
+  cloudformation:
+    stack_name: "{{aws_environment}}-cdn"
+    state: present
+    template: roles/web-assets/files/cdn-resources.yml
+    template_parameters:
+      Environment: "{{aws_environment}}"
+      PriceClass: "{{cdn_price_class}}"
+  tags:
+    - web-assets
