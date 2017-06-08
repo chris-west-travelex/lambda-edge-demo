@@ -1,0 +1,8 @@
+---
+# Tests
+# =====
+- name: Run tests
+  local_action: command rake spec:web-assets
+  environment:
+    AWS_ENVIRONMENT: "{{aws_environment}}"
+  changed_when: false

@@ -12,3 +12,8 @@
       PriceClass: "{{cdn_price_class}}"
   tags:
     - web-assets
+
+- include: tests.yml
+  tags:
+    - web-assets
+    - tests
