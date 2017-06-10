@@ -2,6 +2,14 @@
 # Tasks
 # =====
 #
+- name: Create an OAI for CloudFront
+  cloudfront_oai:
+    state: present
+    comment: "{{aws_environment}}-oai"
+  register: oai
+  tags:
+    - web-assets
+
 - name: Create CDN distribution and associated resources
   cloudformation:
     stack_name: "{{aws_environment}}-cdn"
@@ -10,6 +18,8 @@
     template_parameters:
       Environment: "{{aws_environment}}"
       PriceClass: "{{cdn_price_class}}"
+      OriginAccessIdentityId: "{{oai.identity.id}}"
+      OriginAccessIdentityCanonicalUser: "{{oai.identity.s3_canonical_user_id}}"
   tags:
     - web-assets
 

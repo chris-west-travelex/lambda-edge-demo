@@ -15,12 +15,45 @@ Parameters:
     Type: String
     Description: >
       The CloudFront price class, e.g. PriceClass_100.
+  OriginAccessIdentityId:
+    Type: String
+    Description: >
+      The ID from the CloudFront OAI that is used to authenticate this
+      CloudFront distribution with its S3 origin.
+  OriginAccessIdentityCanonicalUser:
+    Type: String
+    Description: >
+      The CanonicalUser from the CloudFront OAI that is used to authenticate
+      this CloudFront distribution with its S3 origin.
 Resources:
+  CDN:
+    # CloudFront distribution for the site
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: !Sub "${Environment}-s3"
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2
+        Logging:
+          Bucket: !Sub "${CDNLogs}.s3.amazonaws.com"
+          Prefix: "cloudfront/"
+        Origins:
+          - DomainName: !GetAtt CDNAssets.DomainName
+            Id: !Sub "${Environment}-s3"
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdentityId}"
+        PriceClass: !Ref PriceClass
+
   CDNAssets:
     # S3 bucket for storing the CDN web assets (e.g. HTML, CSS)
     Type: "AWS::S3::Bucket"
     Properties:
-      AccessControl: PublicRead
+      AccessControl: BucketOwnerFullControl
       CorsConfiguration:
         CorsRules:
           - AllowedMethods: ["GET", "HEAD"]
@@ -28,6 +61,23 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref CDNLogs
         LogFilePrefix: "s3/"
+
+  CDNAssetsAccessPolicy:
+    # S3 bucket policy to permit CloudFront to access its assets
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref CDNAssets
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: allowCDN
+            Effect: Allow
+            Principal:
+              CanonicalUser: !Ref OriginAccessIdentityCanonicalUser
+            Action:
+              - "s3:GetObject*"
+            Resource:
+              - !Sub "arn:aws:s3:::${CDNAssets}/*"
 
   CDNLogs:
     # S3 bucket for storing access logs for CloudFront and the assets

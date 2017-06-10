@@ -9,7 +9,7 @@ context 'assets bucket' do
   describe s3_bucket(assets_bucket) do
     it { should exist }
     it { should have_acl_grant(grantee: s3_owner, permission: 'FULL_CONTROL') }
-    it { should have_acl_grant(grantee: s3_all_users, permission: 'READ') }
+    it { should_not have_acl_grant(grantee: s3_all_users, permission: 'READ') }
     it { should have_cors_rule(
                   allowed_methods: ['GET', 'HEAD'],
                   allowed_origins: ['*']
@@ -17,8 +17,9 @@ context 'assets bucket' do
     it { should have_logging_enabled(target_bucket: logging_bucket, target_prefix: 's3/') }
   end
 
-  its 'content is public' do
-    expect(http_get("http://s3-eu-west-1.amazonaws.com/#{assets_bucket}").status_code).to eq 200
+  its 'content is not public' do
+    expect(http_get("http://s3-eu-west-1.amazonaws.com/#{assets_bucket}").status_code).to eq 403
+    expect(http_get("https://#{assets_bucket}.s3.amazonaws.com").status_code).to eq 403
   end
 
 end
@@ -32,6 +33,7 @@ context 'logging bucket' do
 
   its 'content is not public' do
     expect(http_get("http://s3-eu-west-1.amazonaws.com/#{logging_bucket}").status_code).to eq 403
+    expect(http_get("http://#{logging_bucket}.s3.amazonaws.com").status_code).to eq 403
   end
 
   its 'logs cannot be deleted' do
@@ -40,3 +42,4 @@ context 'logging bucket' do
     expect { s3.delete_object(bucket: logging_bucket, key: a_log.key) }.to raise_error Aws::S3::Errors::AccessDenied
   end
 end
+
