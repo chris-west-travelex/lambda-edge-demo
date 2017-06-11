@@ -3,8 +3,8 @@ require 'spec_helper'
 awsenv = ENV['AWS_ENVIRONMENT']
 
 assets_bucket = get_resource("#{awsenv}-cdn", "CDNAssets")
-logging_bucket = get_resource("#{awsenv}-cdn", "CDNLogs")
 cloudfront_distro = get_resource("#{awsenv}-cdn", "CDN")
+edge_lambda = get_resource("#{awsenv}-cdn", "CDNLambda")
 
 context 'oai' do
   describe(cloudfront_oai("#{awsenv}-oai")) do
@@ -30,4 +30,39 @@ context 'cloudfront' do
 
   # TODO
   #  - there should be an index.html
+  #  - logs should be written in the right places in the logging bucket
+  #    (or at least the prefixes exist)
+end
+
+context 'lambda' do
+  payload = <<~EOF
+    {
+      "Records": [{
+        "cf": {
+          "config": {"distributionId": "EXAMPLE"},
+          "response": {
+            "status": "200",
+            "headers": {
+              "Last-Modified": ["2016-11-25"],
+              "Vary": ["*"],
+              "X-Amz-Meta-Last-Modified": ["2016-01-01"]
+            },
+            "statusDescription": "HTTP OK",
+            "httpVersion": "2.0"
+          }
+        }
+      }]
+    }
+  EOF
+  describe(lambda_config(edge_lambda)) do
+    its(:runtime) { should eq "nodejs4.3-edge" }
+  end
+
+  describe(lambda_call(edge_lambda, payload)) do
+    its(:status_code) { should eq 200 }
+    its(:function_error) { should be_nil }
+
+    # TODO
+    #  - the right headers are set
+  end
 end

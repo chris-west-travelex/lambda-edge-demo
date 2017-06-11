@@ -20,6 +20,16 @@
       PriceClass: "{{cdn_price_class}}"
       OriginAccessIdentityId: "{{oai.identity.id}}"
       OriginAccessIdentityCanonicalUser: "{{oai.identity.s3_canonical_user_id}}"
+      HPKPHeader: "{{hpkp_header}}"
+  register: cdn_stack
+  tags:
+    - web-assets
+
+- name: Fix lambda run-time
+  lambda:
+    name: "{{cdn_stack.stack_outputs.CDNLambda}}"
+    state: present
+    runtime: "nodejs4.3-edge"
   tags:
     - web-assets
 

@@ -1,2 +1,9 @@
 ---
-
+# Settings for the Demo Environment
+# =================================
+#
+# ..var:: string hpkp_header
+#
+#     Full HPKP header for responses for the distribution
+#
+hpkp_header: TODO

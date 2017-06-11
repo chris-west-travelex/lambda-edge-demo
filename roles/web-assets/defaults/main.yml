@@ -11,3 +11,9 @@
 #    See: http://aws.amazon.com/cloudfront/pricing/
 #
 cdn_price_class: PriceClass_100
+
+# ..var:: string hpkp_header
+#
+#     Full HPKP header for responses for the distribution.
+#
+hpkp_header:

@@ -54,6 +54,17 @@ def cloudfront_oai(comment)
   end
 end
 
+# lambda
+def lambda_call(fn, payload)
+  l_client = Aws::Lambda::Client.new
+  l_client.invoke function_name: fn, payload: payload
+end
+
+def lambda_config(fn)
+  l_client = Aws::Lambda::Client.new
+  l_client.get_function_configuration function_name: fn
+end
+
 # http
 def http_get(url)
   http = HTTPClient.new
