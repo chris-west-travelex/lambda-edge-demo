@@ -33,6 +33,15 @@
   tags:
     - web-assets
 
+- name: Associate the Lambda with the CloudFront distribution (+ fix IPv6)
+  cloudfront_misc:
+    id: "{{cdn_stack.stack_outputs.CDNId}}"
+    is_ipv6_enabled: true
+    lambda_assoc_eventtype: viewer-response
+    lambda_assoc_arn: "{{cdn_stack.stack_outputs.CDNLambda}}"
+  tags:
+    - web-assets
+
 - include: tests.yml
   tags:
     - web-assets

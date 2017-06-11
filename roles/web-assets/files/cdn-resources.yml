@@ -48,6 +48,7 @@ Resources:
             headers['X-Frame-Options']           = "DENY";
             headers['X-XSS-Protection']          = "1; mode=block";
             headers['Referrer-Policy']           = "same-origin";
+            headers['Content-Security-Policy']   = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';";
             callback(null, response);
           };
       Description: !Sub >
@@ -56,11 +57,16 @@ Resources:
       Role: !GetAtt CDNLambdaRole.Arn
       Runtime: nodejs6.10
 
+  CDNLambdaResourcePolicy:
+    # Resource policy to allow CloudFront to call this lambda
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:GetFunction"
+      FunctionName: !Ref CDNLambda
+      Principal: edgelambda.amazonaws.com
+
   CDNLambdaRole:
     # Execution role for the Lambda@Edge function
-    # TODO: this very likely needs 
-    #   action lambda:GetFunction 
-    #   principal edgelambda.amazonaws.com
     Type: "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
@@ -160,5 +166,9 @@ Resources:
 Outputs:
   CDNLambda:
     Description: >
-      Name of the Lambda@Edge function (so that we can fix its runtime)
-    Value: !Ref CDNLambda
+      ARN of the Lambda@Edge function (so that we can fix its runtime)
+    Value: !GetAtt CDNLambda.Arn
+  CDNId:
+    Description: >
+      Id of the CDN
+    Value: !Ref CDN

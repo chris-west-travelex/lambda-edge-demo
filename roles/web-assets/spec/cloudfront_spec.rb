@@ -21,7 +21,7 @@ context 'cloudfront' do
     it { should have_origin_domain_name "#{assets_bucket}.s3.amazonaws.com" }
     its(:price_class) { should eq "PriceClass_100" }
     its(:http_version) { should eq "HTTP2" }
-    #its(:is_ipv6_enabled) { should be_true }
+    its(:is_ipv6_enabled) { should be_true }
   end
 
   xit 'redirects http to https' do
@@ -30,6 +30,7 @@ context 'cloudfront' do
 
   # TODO
   #  - there should be an index.html
+  #  - a GET on index.html should return the right headers
   #  - logs should be written in the right places in the logging bucket
   #    (or at least the prefixes exist)
 end

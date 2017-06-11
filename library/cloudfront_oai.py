@@ -8,9 +8,9 @@ ANSIBLE_METADATA = {'metadata_version': '0.0',
 DOCUMENTATION = '''
 ---
 module: cloudfront_facts
-short_description: Obtain facts about an AWS CloudFront distribution
+short_description: 
 description:
-  - Gets information about an AWS CloudFront distribution
+  - Manage CloudFront Origin Access Identities
 requirements:
   - boto3 >= 1.0.0
   - python >= 2.6
