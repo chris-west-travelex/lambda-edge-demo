@@ -21,7 +21,7 @@ context 'cloudfront' do
     it { should have_origin_domain_name "#{assets_bucket}.s3.amazonaws.com" }
     its(:price_class) { should eq "PriceClass_100" }
     its(:http_version) { should eq "HTTP2" }
-    its(:is_ipv6_enabled) { should be_true }
+    its(:is_ipv6_enabled) { should be true }
   end
 
   xit 'redirects http to https' do
@@ -36,7 +36,7 @@ context 'cloudfront' do
 end
 
 context 'lambda' do
-  payload = <<~EOF
+  payload = <<-EOF
     {
       "Records": [{
         "cf": {

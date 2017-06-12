@@ -49,6 +49,7 @@ Resources:
             headers['X-XSS-Protection']          = "1; mode=block";
             headers['Referrer-Policy']           = "same-origin";
             headers['Content-Security-Policy']   = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';";
+            headers['Expect-CT']                 = "enforce; max-age=31536000;"
             callback(null, response);
           };
       Description: !Sub >
