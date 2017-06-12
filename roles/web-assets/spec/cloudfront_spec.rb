@@ -14,6 +14,13 @@ context 'oai' do
 
 end
 
+# TODO: this doesn't work because the ACM cert is in a different region!
+#context 'acm' do
+#  describe(acm(cloudfront_domain)) do
+#    it { should exist }
+#  end
+#end
+
 context 'cloudfront' do
   describe(cloudfront_distribution(cloudfront_distro)) do
     it { should exist }
@@ -24,10 +31,19 @@ context 'cloudfront' do
     its(:is_ipv6_enabled) { should be true }
   end
 
-  xit 'redirects http to https' do
-    expect(http_get("http://TODO").status_code).to eq 301
+  it 'redirects http to https' do
+    expect(http_get("http://#{cloudfront_domain}").status_code).to eq 301
   end
 
+  describe(http_get("https://#{cloudfront_domain}")) do
+    its(:status_code) { should eq 200 }
+    its(:headers) { should include("X-Content-Type-Options" => "nosniff") }
+    its(:headers) { should include("X-Frame-Options" => "DENY") }
+    its(:headers) { should include("X-XSS-Protection" => "1; mode=block") }
+    its(:headers) { should include("Referrer-Policy" => "same-origin") }
+    its(:headers) { should include("Content-Security-Policy" => "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';") }
+    its(:headers) { should include("Expect-CT" => "enforce; max-age=31536000;") }
+  end
   # TODO
   #  - there should be an index.html
   #  - a GET on index.html should return the right headers

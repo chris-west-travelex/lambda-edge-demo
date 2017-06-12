@@ -1,5 +1,6 @@
 require 'awspec'
 require 'httpclient'
+require 'yaml'
 
 # cloudformation
 def get_resource(stack_name, logical_resource)
@@ -54,6 +55,11 @@ def cloudfront_oai(comment)
   end
 end
 
+def cloudfront_domain
+  # ... from ansible(!)
+  YAML::load_file(File::dirname(__FILE__) + "/../group_vars/" + ENV['AWS_ENVIRONMENT'] + "/vars")['domain_name']
+end
+
 # lambda
 def lambda_call(fn, payload)
   l_client = Aws::Lambda::Client.new
@@ -68,5 +74,10 @@ end
 # http
 def http_get(url)
   http = HTTPClient.new
-  http.get url
+  begin
+    http.get url
+  rescue Exception => e
+    # swallow errors and return, so that we don't crash rspec
+    {error: e}
+  end
 end

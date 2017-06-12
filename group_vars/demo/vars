@@ -2,8 +2,17 @@
 # Settings for the Demo Environment
 # =================================
 #
+# ..var:: string domain_name
+#
+#     Domain name for the CDN distribution. An ACM certificate *will*
+#     be created for this domain, but DNS entries *will not* be created
+#     for it
+#
+domain_name: lambda-demo.travelex.io
+
 # ..var:: string hpkp_header
 #
 #     Full HPKP header for responses for the distribution
 #
 hpkp_header: TODO
+

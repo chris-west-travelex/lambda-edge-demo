@@ -25,6 +25,14 @@ Parameters:
     Description: >
       The CanonicalUser from the CloudFront OAI that is used to authenticate
       this CloudFront distribution with its S3 origin.
+  DomainName:
+    Type: String
+    Description: >
+      The domain name to use for the CDN distribution.
+  Certificate:
+    Type: String
+    Description: >
+      The ARN of the CDN's SSL/TLS certificate.
   HPKPHeader:
     Type: String
     Description: >
@@ -86,6 +94,8 @@ Resources:
     Type: "AWS::CloudFront::Distribution"
     Properties:
       DistributionConfig:
+        Aliases:
+          - !Ref DomainName
         DefaultCacheBehavior:
           ForwardedValues:
             QueryString: false
@@ -103,6 +113,9 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdentityId}"
         PriceClass: !Ref PriceClass
+        ViewerCertificate:
+          AcmCertificateArn: !Ref Certificate
+          SslSupportMethod: sni-only
 
   CDNAssets:
     # S3 bucket for storing the CDN web assets (e.g. HTML, CSS)

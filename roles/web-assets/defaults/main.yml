@@ -2,6 +2,21 @@
 # Defaults
 # ========
 #
+# ..var:: string domain_name
+#
+#     Domain name for the CDN distribution. An ACM certificate *will*
+#     be created for this domain, but DNS entries *will not* be created
+#     for it
+#
+domain_name:
+
+# ..var:: string validation_domain_name
+#
+#     The domain to use to validate the ACM certificate. Defaults to the
+#     parent domain of ``domain_name``
+#
+validation_domain_name: "{{domain_name | regex_replace('^.*?\\.')}}"
+    
 # ..var:: string cdn_price_class
 #
 #    Price class for CloudFront. Must be *PriceClass_100*, *PriceClass_200* or
