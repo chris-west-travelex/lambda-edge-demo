@@ -56,4 +56,4 @@ hpkp_pins: []
 #
 #    Content-Security-Policy header value
 #
-content_security_policy: "default-src 'none'; script-src 'self'; connect-src'self'; img-src 'self'; style-src 'self';"
+content_security_policy: "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';"

@@ -71,6 +71,15 @@ To run the tests independently of the deployment, try:
 clean bill-of-health.
 
 
+Further Reading
+---------------
+
+* https://medium.com/@tom.cook/edge-lambda-cloudfront-custom-headers-3d134a2c18a2
+* https://scotthelme.co.uk/hardening-your-http-response-headers/
+* https://observatory.mozilla.org/
+* https://report-uri.io/home/pkp_analyse/
+
+
 Licence
 -------
 
