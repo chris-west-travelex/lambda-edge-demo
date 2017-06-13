@@ -10,9 +10,11 @@
 #
 domain_name: lambda-demo.travelex.io
 
-# ..var:: string hpkp_header
+# ..var:: list hpkp_pins
 #
-#     Full HPKP header for responses for the distribution
+#     Pin a key pair's public fingerprint in addition to the AWS trust chain,
+#     so that you can always maintain at least one pin. (Keep the private key
+#     safe!)
 #
-hpkp_header: TODO
-
+hpkp_pins:
+ - KYgJGUJ43y3QuC03vzssHi9Idsh0sxAYMKaXnf0mRiw=

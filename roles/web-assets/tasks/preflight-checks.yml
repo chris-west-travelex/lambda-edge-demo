@@ -1,0 +1,14 @@
+---
+# Pre-Flight Checks
+# =================
+#
+# Make sure the right dependencies are installed on localhost before
+# running any tasks that will change something.
+- name: Check commands available
+  command: >
+    which {{item}}
+  with_items:
+    - openssl
+    - jq
+    - aws
+  changed_when: false

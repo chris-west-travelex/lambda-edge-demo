@@ -22,6 +22,15 @@ end
 #end
 
 context 'cloudfront' do
+  before(:all) do
+    # put a dummy index.html up if there isn't one already
+    s3_client = Aws::S3::Client.new
+    begin
+      s3_client.get_object(bucket: assets_bucket, key: "index.html")
+    rescue Aws::S3::Errors::NoSuchKey
+      s3_client.put_object(bucket: assets_bucket, key: "index.html", body: File::dirname(__FILE__) + "/../../../web/index.html")
+    end
+  end
   describe(cloudfront_distribution(cloudfront_distro)) do
     it { should exist }
     it { should be_deployed }
@@ -43,10 +52,10 @@ context 'cloudfront' do
     its(:headers) { should include("Referrer-Policy" => "same-origin") }
     its(:headers) { should include("Content-Security-Policy" => "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';") }
     its(:headers) { should include("Expect-CT" => "enforce; max-age=31536000;") }
+    its(:headers) { should include("Public-Key-Pins") }
   end
+
   # TODO
-  #  - there should be an index.html
-  #  - a GET on index.html should return the right headers
   #  - logs should be written in the right places in the logging bucket
   #    (or at least the prefixes exist)
 end

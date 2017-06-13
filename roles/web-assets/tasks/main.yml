@@ -2,6 +2,10 @@
 # Tasks
 # =====
 #
+- include: preflight-checks.yml
+  tags:
+    - web-assets
+
 - name: Create an OAI for CloudFront
   cloudfront_oai:
     state: present
@@ -23,6 +27,22 @@
   tags:
     - web-assets
 
+- name: Calculate HPKP fingerprint for the leaf
+  shell: >
+    aws acm get-certificate \
+            --certificate-arn {{cert_stack.stack_outputs.Certificate}} \
+            --region us-east-1 | \
+    jq -r .Certificate | \
+    openssl x509 -noout -pubkey | \
+    openssl asn1parse -noout -inform pem -out /tmp/hpkp.asn1 && \
+    openssl dgst -sha256 -binary /tmp/hpkp.asn1 | \
+    openssl enc -base64 && \
+    rm -f /tmp/hpkp.asn1
+  register: leaf_fingerprint
+  changed_when: false
+  tags:
+    - web-assets
+
 - name: Create CDN distribution and associated resources
   cloudformation:
     stack_name: "{{aws_environment}}-cdn"
@@ -35,7 +55,9 @@
       OriginAccessIdentityCanonicalUser: "{{oai.identity.s3_canonical_user_id}}"
       DomainName: "{{domain_name}}"
       Certificate: "{{cert_stack.stack_outputs.Certificate}}"
-      HPKPHeader: "{{hpkp_header}}"
+      HPKPHeader: >
+        pin-sha256="{{([leaf_fingerprint.stdout]+hpkp_pins+default_hpkp_pins) | join('"; pin-sha256="')}}"; max-age=5184000
+      CSPHeader: "{{content_security_policy}}"
   register: cdn_stack
   tags:
     - web-assets

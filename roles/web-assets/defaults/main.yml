@@ -16,7 +16,7 @@ domain_name:
 #     parent domain of ``domain_name``
 #
 validation_domain_name: "{{domain_name | regex_replace('^.*?\\.')}}"
-    
+
 # ..var:: string cdn_price_class
 #
 #    Price class for CloudFront. Must be *PriceClass_100*, *PriceClass_200* or
@@ -27,8 +27,33 @@ validation_domain_name: "{{domain_name | regex_replace('^.*?\\.')}}"
 #
 cdn_price_class: PriceClass_100
 
-# ..var:: string hpkp_header
+# ..var:: list default_hpkp_pins
 #
-#     Full HPKP header for responses for the distribution.
+#     List of SHA256 fingerprints to pin via HPKP, excluding the current
+#     leaf certificate.
 #
-hpkp_header:
+#     NB. calculate these with:
+#
+# ..code-block:: bash
+#
+#     $ cat mycert.pem | \
+#       openssl x509 -noout -pubkey | \
+#       openssl asn1parse -noout -inform pem -out /tmp/hpkp.asn1 && \
+#       openssl dgst -sha256 -binary /tmp/hpkp.asn1 | \
+#       openssl enc -base64
+#
+default_hpkp_pins:
+ - JSMzqOOrtyOT1kmau6zKhgT676hGgczD5VMdRMyJZFA=  # Amazon Server CA 1B
+ - KwccWaCgrnaw6tsrrSO61FgLacNgG2MMLq8GE6+oP5I=  # Starfield G2
+
+# ..var:: list hpkp_pins
+#
+#    List of additional SHA256 fingerprints for HPKP
+#
+hpkp_pins: []
+
+# ..var:: string content_security_policy
+#
+#    Content-Security-Policy header value
+#
+content_security_policy: "default-src 'none'; script-src 'self'; connect-src'self'; img-src 'self'; style-src 'self';"

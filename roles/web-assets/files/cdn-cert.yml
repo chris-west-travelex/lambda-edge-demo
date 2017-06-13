@@ -1,0 +1,30 @@
+---
+# Certificate Resources
+# =====================
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Create ACM certificate for the CDN (stack must be deployed to us-east-1).
+Parameters:
+  DomainName:
+    Type: String
+    Description: >
+      The domain name to use for the CDN distribution.
+  ValidationDomainName:
+    Type: String
+    Description: >
+      The domain to use to validate the ACM certificate.
+Resources:
+  CDNCert:
+    # SSL/TLS certificate for CloudFront
+    Type: "AWS::CertificateManager::Certificate"
+    Properties:
+      DomainName: !Ref DomainName
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          ValidationDomain: !Ref ValidationDomainName
+Outputs:
+  Certificate:
+    Description: >
+      ARN of the created certificate
+    Value: !Ref CDNCert
