@@ -71,6 +71,44 @@ To run the tests independently of the deployment, try:
 clean bill-of-health.
 
 
+Why Is This Like It Is?!
+------------------------
+
+Infrastructure automation tools should be declarative and idempotent, and
+CloudFormation is great at that. However it falls short of total API coverage
+and there's always that *one little thing* that you need to do outside it.
+
+Ansible is a fantastic tool for provisioning things and has a robust set of
+best practices for structuring playbooks and inventory; plus some handy tools
+for secrets management and the like.
+
+Awspec is the only AWS testing library out there, and rspec is lovely.
+
+Here we've put the three of these tools together. So
+
+* groups in ``group_vars/`` become environments (e.g. development; production),
+  although here there is simply ``demo``. The inventory system enables us to
+  set different configuration for each environment and encrypt secrets using
+  vault. You could also bind groups to different git branches with a task or
+  two, to create a proper release management process.
+
+* roles are composed into groups to build up an environment. Again, this demo
+  only has a single role, but it's not difficult to imagine adding more for
+  enabling CloudTrail, adding an API layer, ...
+
+* ``host_vars`` are just used as *glue*, since Ansible only has one host it
+  can provision - i.e. ``localhost``.
+
+* awspec tests all belong with the role that they are testing, so that roles
+  can be extracted into their own repositories and shared between projects.
+  Tests are run during the provisioning process rather than independently
+  (because otherwise we'd forget to and they'd rot).
+
+* all the comments are marked up using RST, with a view to using ``yaml2rst``
+  to dynamically generate detailed documentation in the future. This works
+  better than you might think :P
+
+
 Further Reading
 ---------------
 
@@ -78,6 +116,8 @@ Further Reading
 * https://scotthelme.co.uk/hardening-your-http-response-headers/
 * https://observatory.mozilla.org/
 * https://report-uri.io/home/pkp_analyse/
+* http://docs.ansible.com/ansible/playbooks_best_practices.html
+* https://github.com/k1LoW/awspec
 
 
 Licence
