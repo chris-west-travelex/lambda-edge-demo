@@ -28,7 +28,7 @@ context 'cloudfront' do
     begin
       s3_client.get_object(bucket: assets_bucket, key: "index.html")
     rescue Aws::S3::Errors::NoSuchKey
-      s3_client.put_object(bucket: assets_bucket, key: "index.html", body: File::dirname(__FILE__) + "/../../../web/index.html")
+      s3_client.put_object(bucket: assets_bucket, key: "index.html", body: File::open(File::dirname(__FILE__) + "/../../../web/index.html"))
     end
   end
   describe(cloudfront_distribution(cloudfront_distro)) do
